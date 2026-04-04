@@ -1,0 +1,393 @@
+/* ============================================================
+   CODEX OF PHYSICS — Simulation Lab Page Styles
+   ============================================================ */
+
+/* ──────────────────────────────────────────
+   LAB PAGE LAYOUT
+   ────────────────────────────────────────── */
+.lab-page {
+  min-height: 100vh;
+  background: var(--bg-void);
+  padding-top: var(--nav-height);
+}
+
+.lab-header {
+  padding: 48px var(--section-pad-x) 40px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-deep);
+}
+
+.lab-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 24px;
+}
+
+.lab-breadcrumb a { color: var(--accent-cyan); transition: opacity 0.2s; }
+.lab-breadcrumb a:hover { opacity: 0.7; }
+.lab-breadcrumb span { color: var(--text-muted); }
+
+.lab-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.lab-title {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.lab-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.lab-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.lab-meta-chip {
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chip-quantum {
+  background: rgba(0,212,255,0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0,212,255,0.2);
+}
+
+.chip-interactive {
+  background: rgba(0,255,157,0.08);
+  color: var(--accent-green);
+  border: 1px solid rgba(0,255,157,0.15);
+}
+
+/* ──────────────────────────────────────────
+   LAB BODY (canvas + controls side by side)
+   ────────────────────────────────────────── */
+.lab-body {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 0;
+  min-height: calc(100vh - var(--nav-height) - 200px);
+}
+
+.lab-canvas-area {
+  position: relative;
+  background: #030508;
+  border-right: 1px solid var(--border-subtle);
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#sim-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.canvas-corner-label {
+  position: absolute;
+  top: 16px; left: 20px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  color: rgba(0,212,255,0.4);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.canvas-fps {
+  position: absolute;
+  top: 16px; right: 20px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: rgba(0,212,255,0.3);
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────
+   CONTROL PANEL
+   ────────────────────────────────────────── */
+.control-panel {
+  background: var(--bg-deep);
+  padding: 28px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cp-section-title {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cp-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* Slider control */
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  transition: border-color var(--dur-fast) ease;
+}
+
+.control-item:focus-within { border-color: var(--border-accent); }
+
+.control-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.control-label {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+
+.control-value {
+  font-size: 0.825rem;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+/* Range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-card);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0,212,255,0.5);
+  cursor: pointer;
+  transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 16px rgba(0,212,255,0.7);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  border: none;
+  cursor: pointer;
+}
+
+/* Toggle switch */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.toggle-label {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.toggle {
+  position: relative;
+  width: 40px; height: 22px;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-card);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background var(--dur-fast) ease;
+  border: 1px solid var(--border-soft);
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: transform var(--dur-base) var(--ease-spring),
+              background var(--dur-fast) ease;
+}
+
+.toggle input:checked + .toggle-track {
+  background: rgba(0,212,255,0.15);
+  border-color: rgba(0,212,255,0.3);
+}
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(18px);
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(0,212,255,0.6);
+}
+
+/* Reset button */
+.cp-reset-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.825rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  transition: all var(--dur-fast) ease;
+}
+
+.cp-reset-btn:hover {
+  border-color: var(--border-accent);
+  color: var(--accent-cyan);
+  background: rgba(0,212,255,0.05);
+}
+
+/* ──────────────────────────────────────────
+   PHYSICS EXPLAINER (below canvas)
+   ────────────────────────────────────────── */
+.lab-explainer {
+  padding: 56px var(--section-pad-x);
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.explainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 36px;
+}
+
+.explainer-card {
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.explainer-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm);
+  background: rgba(0,212,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+}
+
+.explainer-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.explainer-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.formula-box {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent-cyan);
+  letter-spacing: 0.03em;
+}
+
+/* ──────────────────────────────────────────
+   RESPONSIVE — Lab Page
+   ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .lab-body { grid-template-columns: 1fr; }
+  .lab-canvas-area { min-height: 450px; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+  .control-panel { flex-direction: row; flex-wrap: wrap; }
+  .control-group { flex: 1; min-width: 240px; }
+}
+
+@media (max-width: 640px) {
+  .lab-header { padding: 32px 20px 28px; }
+  .control-panel { padding: 20px 16px; }
+  .lab-canvas-area { min-height: 360px; }
+}
