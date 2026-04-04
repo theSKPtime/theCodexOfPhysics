@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bohr Model — Codex of Physics Lab</title>
+  <meta name="description" content="Interactive 3D Bohr atomic model simulation. Explore electron shells, orbital radii, and quantum transitions in real-time WebGL." />
+  <meta name="theme-color" content="#060811" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/simulation.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body class="lab-page">
+
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       NAVIGATION
+       ══════════════════════════════════════════════════════ -->
+  <nav class="nav is-scrolled" id="main-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" stroke="#00d4ff" stroke-width="1.2" opacity="0.7" transform="rotate(30 16 16)"/>
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" stroke="#00d4ff" stroke-width="1.2" opacity="0.7" transform="rotate(-30 16 16)"/>
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" stroke="#00d4ff" stroke-width="1.2" opacity="0.7"/>
+            <circle cx="16" cy="16" r="3" fill="#ff5533"/>
+          </svg>
+        </div>
+        Codex of Physics
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#simulations">Library</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html" class="nav-cta">← Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAB HEADER
+       ══════════════════════════════════════════════════════ -->
+  <header class="lab-header" role="banner">
+    <div class="lab-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Codex of Physics</a>
+      <span aria-hidden="true">/</span>
+      <span>Simulations</span>
+      <span aria-hidden="true">/</span>
+      <span style="color:var(--text-secondary)">Bohr Model</span>
+    </div>
+    <div class="lab-title-row">
+      <div>
+        <h1 class="lab-title">Bohr Model</h1>
+        <p class="lab-subtitle">
+          Interactive 3D simulation of Niels Bohr's 1913 atomic model.
+          Electrons orbit the nucleus in quantised shells — each shell at radius r&#8320; · n².
+          Drag to rotate. Adjust parameters on the right.
+        </p>
+        <div class="lab-meta" style="margin-top:16px;">
+          <span class="lab-meta-chip chip-quantum">Quantum Mechanics</span>
+          <span class="lab-meta-chip chip-interactive">WebGL · Three.js</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAB BODY — Canvas + Control Panel
+       ══════════════════════════════════════════════════════ -->
+  <main class="lab-body" id="main-content">
+
+    <!-- ── Canvas area ── -->
+    <div class="lab-canvas-area" aria-label="3D simulation canvas">
+      <canvas id="sim-canvas"></canvas>
+      <div class="canvas-corner-label" aria-hidden="true">Bohr Model · n = 1–5</div>
+      <div class="canvas-fps" id="fps-counter" aria-hidden="true">— fps</div>
+    </div>
+
+    <!-- ── Control Panel ── -->
+    <aside class="control-panel" aria-label="Simulation controls" role="complementary">
+
+      <!-- Simulation Controls -->
+      <div>
+        <h2 class="cp-section-title">Parameters</h2>
+        <div class="control-group">
+
+          <!-- N Levels -->
+          <div class="control-item">
+            <div class="control-label-row">
+              <label class="control-label" for="ctrl-n-levels">Electron Shells (N)</label>
+              <span class="control-value" id="val-n-levels">5</span>
+            </div>
+            <input
+              type="range"
+              id="ctrl-n-levels"
+              min="1" max="5" step="1" value="5"
+              aria-label="Number of electron shells"
+            />
+            <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono);">
+              r = a₀ · n²
+            </p>
+          </div>
+
+          <!-- Simulation Speed -->
+          <div class="control-item">
+            <div class="control-label-row">
+              <label class="control-label" for="ctrl-speed">Orbital Scale (a₀)</label>
+              <span class="control-value" id="val-speed">1×</span>
+            </div>
+            <input
+              type="range"
+              id="ctrl-speed"
+              min="0.4" max="2.0" step="0.1" value="1.0"
+              aria-label="Bohr radius scale factor"
+            />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Display Options -->
+      <div>
+        <h2 class="cp-section-title">Display</h2>
+        <div class="control-group">
+
+          <div class="toggle-row">
+            <span class="toggle-label">Auto-rotate Camera</span>
+            <label class="toggle" aria-label="Toggle camera auto-rotation">
+              <input type="checkbox" id="ctrl-camera-rotate" checked />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <span class="toggle-label">Electron Trails</span>
+            <label class="toggle" aria-label="Toggle electron trail effect">
+              <input type="checkbox" id="ctrl-trails" />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Playback -->
+      <div>
+        <h2 class="cp-section-title">Playback</h2>
+        <div class="control-group">
+          <button class="cp-reset-btn" id="ctrl-pause" aria-label="Pause or play simulation">
+            ⏸ Pause
+          </button>
+          <button class="cp-reset-btn" id="ctrl-reset" aria-label="Reset simulation to defaults">
+            ↺ Reset Defaults
+          </button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div>
+        <h2 class="cp-section-title">Shell Legend</h2>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.775rem;font-family:var(--font-mono);padding:8px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#00d4ff;display:inline-block;box-shadow:0 0 6px #00d4ff;"></span> n = 1</span>
+            <span style="color:var(--text-muted);">r = 0.80 a₀</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.775rem;font-family:var(--font-mono);padding:8px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#e040fb;display:inline-block;box-shadow:0 0 6px #e040fb;"></span> n = 2</span>
+            <span style="color:var(--text-muted);">r = 3.20 a₀</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.775rem;font-family:var(--font-mono);padding:8px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#ffd600;display:inline-block;box-shadow:0 0 6px #ffd600;"></span> n = 3</span>
+            <span style="color:var(--text-muted);">r = 7.20 a₀</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.775rem;font-family:var(--font-mono);padding:8px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#00ff78;display:inline-block;box-shadow:0 0 6px #00ff78;"></span> n = 4</span>
+            <span style="color:var(--text-muted);">r = 12.8 a₀</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:0.775rem;font-family:var(--font-mono);padding:8px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#ff6d00;display:inline-block;box-shadow:0 0 6px #ff6d00;"></span> n = 5</span>
+            <span style="color:var(--text-muted);">r = 20.0 a₀</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interaction tip -->
+      <div style="padding:12px 16px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:var(--radius-md);font-size:0.775rem;color:var(--text-muted);line-height:1.55;">
+        <span style="color:var(--accent-cyan);font-weight:600;">↗ Tip:</span> Click and drag on the canvas to orbit the camera manually.
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PHYSICS EXPLAINER
+       ══════════════════════════════════════════════════════ -->
+  <section class="lab-explainer" aria-labelledby="explainer-title">
+    <div class="section-label">Physics Notes</div>
+    <h2 class="section-title" id="explainer-title" style="font-size:1.5rem;margin-bottom:0;">The Bohr Model — Key Principles</h2>
+    <div class="explainer-grid">
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">⚛️</div>
+        <h3>Quantised Orbits</h3>
+        <p>Electrons can only occupy specific orbits where the angular momentum is an integer multiple of ℏ. Between orbits, electrons do not exist.</p>
+        <div class="formula-box">L = nℏ,  n = 1, 2, 3...</div>
+      </div>
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">📐</div>
+        <h3>Orbital Radius</h3>
+        <p>Each orbit has a precise radius proportional to n². The Bohr radius a₀ ≈ 0.529 Å defines the scale of the innermost shell.</p>
+        <div class="formula-box">rₙ = a₀ · n²</div>
+      </div>
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">⚡</div>
+        <h3>Energy Levels</h3>
+        <p>Each shell has a precise energy. Photons are emitted when electrons fall to lower shells — the energy difference determines the photon's frequency.</p>
+        <div class="formula-box">Eₙ = −13.6 eV / n²</div>
+      </div>
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">🌊</div>
+        <h3>Wave-like Orbits</h3>
+        <p>de Broglie later showed the orbits correspond to standing waves. The orbit circumference must equal an integer number of wavelengths.</p>
+        <div class="formula-box">2πrₙ = nλ</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════════════════ -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">Codex of Physics</div>
+        <div class="footer-copy">Simulation built with Three.js · Physics: Bohr (1913)</div>
+        <div class="footer-credit">Created by <span>Soham Kumar Patyal</span></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SCRIPTS — Three.js + Simulation
+       ══════════════════════════════════════════════════════ -->
+  <!-- Three.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <!-- Simulation script -->
+  <script src="js/bohr-simulation.js"></script>
+  <!-- Nav scroll effect (inline for lab page — no Hero canvas needed) -->
+  <script>
+    (function () {
+      const nav = document.getElementById('main-nav');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 30) nav.classList.add('is-scrolled');
+        else nav.classList.add('is-scrolled'); // always keep glass on lab page
+      }, { passive: true });
+
+      // Smooth scroll
+      document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const target = document.querySelector(link.getAttribute('href'));
+          if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+        });
+      });
+
+      // Canvas sizing fix — must run after layout
+      function resizeCanvas() {
+        const c = document.getElementById('sim-canvas');
+        const area = c.parentElement;
+        c.style.width = area.clientWidth + 'px';
+        c.style.height = area.clientHeight + 'px';
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+    })();
+  </script>
+
+</body>
+</html>
