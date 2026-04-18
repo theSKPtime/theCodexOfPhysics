@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schrödinger Orbital — Codex of Physics Lab</title>
+  <meta name="description" content="Interactive 3D hydrogen orbital simulation. Explore quantum wavefunctions, probability density clouds, and orbital shapes for any quantum numbers (n, l, m)." />
+  <meta name="theme-color" content="#060811" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/simulation.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body class="lab-page">
+
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav is-scrolled" id="main-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" stroke="#00d4ff" stroke-width="1.2" opacity="0.7" transform="rotate(30 16 16)"/>
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" stroke="#00d4ff" stroke-width="1.2" opacity="0.7" transform="rotate(-30 16 16)"/>
+            <ellipse cx="16" cy="16" rx="14" ry="5.5" stroke="#00d4ff" stroke-width="1.2" opacity="0.7"/>
+            <circle cx="16" cy="16" r="3" fill="#ff5533"/>
+          </svg>
+        </div>
+        Codex of Physics
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#simulations">Library</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html" class="nav-cta">← Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- LAB HEADER -->
+  <header class="lab-header" role="banner">
+    <div class="lab-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Codex of Physics</a>
+      <span aria-hidden="true">/</span>
+      <span>Simulations</span>
+      <span aria-hidden="true">/</span>
+      <span style="color:var(--text-secondary)">Schrödinger Orbital</span>
+    </div>
+    <div class="lab-title-row">
+      <div>
+        <h1 class="lab-title">Schrödinger Orbital</h1>
+        <p class="lab-subtitle">
+          3D probability density clouds of hydrogen-like atomic orbitals.
+          The wavefunction ψ(n,l,m) is computed from Laguerre polynomials and spherical harmonics,
+          then visualised via Monte Carlo sampling.
+        </p>
+        <div class="lab-meta" style="margin-top:16px;">
+          <span class="lab-meta-chip chip-quantum">Wave Mechanics</span>
+          <span class="lab-meta-chip chip-interactive">WebGL · Three.js</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LAB BODY -->
+  <main class="lab-body" id="main-content">
+
+    <!-- Canvas area -->
+    <div class="lab-canvas-area" aria-label="3D orbital visualization canvas">
+      <canvas id="sim-canvas"></canvas>
+      <div class="canvas-corner-label" aria-hidden="true">
+        Orbital: <span id="quantum-state-display">2p (m=0)</span>
+      </div>
+      <div class="canvas-fps" id="fps-counter" aria-hidden="true">— fps</div>
+      <!-- Generation status -->
+      <div style="position:absolute;bottom:16px;left:20px;font-size:0.65rem;font-family:var(--font-mono);color:var(--accent-green);pointer-events:none;" id="gen-status">Ready</div>
+    </div>
+
+    <!-- Control Panel -->
+    <aside class="control-panel" aria-label="Orbital controls" role="complementary">
+
+      <!-- Quantum Numbers -->
+      <div>
+        <h2 class="cp-section-title">Quantum Numbers</h2>
+        <div class="control-group">
+
+          <!-- n -->
+          <div class="control-item">
+            <div class="control-label-row">
+              <label class="control-label" for="ctrl-n">Principal (n)</label>
+              <span class="control-value" id="val-n">2</span>
+            </div>
+            <input type="range" id="ctrl-n" min="1" max="6" step="1" value="2"
+              aria-label="Principal quantum number" />
+            <p style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">
+              Energy shell: E = −13.6/n² eV
+            </p>
+          </div>
+
+          <!-- l -->
+          <div class="control-item">
+            <div class="control-label-row">
+              <label class="control-label" for="ctrl-l">Azimuthal (l)</label>
+              <span class="control-value" id="val-l">1 (p)</span>
+            </div>
+            <input type="range" id="ctrl-l" min="0" max="1" step="1" value="1"
+              aria-label="Azimuthal quantum number" />
+            <p style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">
+              Shape: s, p, d, f, g...
+            </p>
+          </div>
+
+          <!-- m -->
+          <div class="control-item">
+            <div class="control-label-row">
+              <label class="control-label" for="ctrl-m">Magnetic (m)</label>
+              <span class="control-value" id="val-m">0</span>
+            </div>
+            <input type="range" id="ctrl-m" min="-1" max="1" step="1" value="0"
+              aria-label="Magnetic quantum number" />
+            <p style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">
+              Orientation: −l ≤ m ≤ l
+            </p>
+          </div>
+
+          <!-- Z -->
+          <div class="control-item">
+            <div class="control-label-row">
+              <label class="control-label" for="ctrl-z">Atomic Number (Z)</label>
+              <span class="control-value" id="val-z">1</span>
+            </div>
+            <input type="range" id="ctrl-z" min="1" max="10" step="1" value="1"
+              aria-label="Atomic number" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Presets -->
+      <div>
+        <h2 class="cp-section-title">Presets</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="cp-reset-btn preset-btn" data-preset="1,0,0">1s</button>
+          <button class="cp-reset-btn preset-btn" data-preset="2,0,0">2s</button>
+          <button class="cp-reset-btn preset-btn" data-preset="2,1,0">2p₀</button>
+          <button class="cp-reset-btn preset-btn" data-preset="2,1,1">2p₁</button>
+          <button class="cp-reset-btn preset-btn" data-preset="3,2,0">3d₀</button>
+          <button class="cp-reset-btn preset-btn" data-preset="3,2,1">3d₁</button>
+          <button class="cp-reset-btn preset-btn" data-preset="4,3,0">4f₀</button>
+          <button class="cp-reset-btn preset-btn" data-preset="5,4,0">5g₀</button>
+        </div>
+      </div>
+
+      <!-- Display -->
+      <div>
+        <h2 class="cp-section-title">Display</h2>
+        <div class="control-group">
+          <div class="toggle-row">
+            <span class="toggle-label">Auto-rotate</span>
+            <label class="toggle" aria-label="Toggle auto-rotation">
+              <input type="checkbox" id="ctrl-auto-rotate" checked />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playback -->
+      <div>
+        <h2 class="cp-section-title">Actions</h2>
+        <div class="control-group">
+          <button class="cp-reset-btn" id="ctrl-fullscreen" aria-label="Toggle fullscreen">
+            ⛶ Fullscreen
+          </button>
+          <button class="cp-reset-btn" id="ctrl-reset" aria-label="Reset to defaults">
+            ↺ Reset Defaults
+          </button>
+        </div>
+      </div>
+
+      <!-- Color Legend -->
+      <div>
+        <h2 class="cp-section-title">Color Key</h2>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.775rem;font-family:var(--font-mono);padding:10px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="width:10px;height:10px;border-radius:50%;background:#5588ee;display:inline-block;box-shadow:0 0 6px #5588ee;"></span>
+            <span>ψ &gt; 0 (positive lobe)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.775rem;font-family:var(--font-mono);padding:10px 12px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ee5566;display:inline-block;box-shadow:0 0 6px #ee5566;"></span>
+            <span>ψ &lt; 0 (negative lobe)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tip -->
+      <div style="padding:12px 16px;background:rgba(124,107,255,0.04);border:1px solid rgba(124,107,255,0.12);border-radius:var(--radius-md);font-size:0.775rem;color:var(--text-muted);line-height:1.55;">
+        <span style="color:var(--accent-indigo);font-weight:600;">⚛ Note:</span> Points are generated
+        via rejection sampling of |ψ|². Higher n orbitals take slightly longer to render.
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- PHYSICS EXPLAINER -->
+  <section class="lab-explainer" aria-labelledby="explainer-title-sch">
+    <div class="section-label">Physics Notes</div>
+    <h2 class="section-title" id="explainer-title-sch" style="font-size:1.5rem;margin-bottom:0;">Schrödinger's Hydrogen Atom</h2>
+    <div class="explainer-grid">
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">🌊</div>
+        <h3>The Wavefunction</h3>
+        <p>The hydrogen atom's electron is described by ψ(r,θ,φ) — a solution to the Schrödinger equation. It encodes all measurable properties of the electron's state.</p>
+        <div class="formula-box">ψ = R_nl(r) · Y_lm(θ,φ)</div>
+      </div>
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">📊</div>
+        <h3>Probability Density</h3>
+        <p>|ψ|² gives the probability density — the likelihood of finding the electron at any given point in space. Dense clouds = high probability regions.</p>
+        <div class="formula-box">P(r,θ,φ) = |ψ(r,θ,φ)|²</div>
+      </div>
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">🔢</div>
+        <h3>Quantum Numbers</h3>
+        <p><strong>n</strong> sets the energy level, <strong>l</strong> determines the orbital shape (s, p, d, f...), and <strong>m</strong> controls orientation in space.</p>
+        <div class="formula-box">n ≥ 1, 0 ≤ l &lt; n, −l ≤ m ≤ l</div>
+      </div>
+
+      <div class="explainer-card">
+        <div class="explainer-icon" aria-hidden="true">📐</div>
+        <h3>Radial Function</h3>
+        <p>The radial part R_nl uses associated Laguerre polynomials and determines how ψ varies with distance from the nucleus. Nodes appear where R = 0.</p>
+        <div class="formula-box">R_nl = N · e^(−ρ/2) · ρ^l · L_{n-l-1}^{2l+1}(ρ)</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">Codex of Physics</div>
+        <div class="footer-copy">Simulation built with Three.js · Physics: Schrödinger (1926)</div>
+        <div class="footer-credit">Created by <span>Soham Kumar Patyal</span></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="js/schrodinger-simulation.js"></script>
+
+</body>
+</html>
